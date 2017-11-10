@@ -90,8 +90,9 @@ func invokeWebhook(ur Webhook, cur float64) {
 	if err != nil {
 		fmt.Println(err)
 		return
+	} else {
+		fmt.Println(res.StatusCode)
 	}
-	fmt.Println(res.StatusCode)
 }
 
 func HandlerProjects(w http.ResponseWriter, r *http.Request) {
