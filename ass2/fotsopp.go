@@ -1,36 +1,36 @@
 package fotsopp
 
 import (
-	"net/http"
+	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"io/ioutil"
+	"net/http"
 	"strings"
-	"bytes"
 )
 
 // Webhook struct for new webhook
 type Webhook struct {
-	Id				bson.ObjectId	`json:"-" bson:"_id"`
-	WebHookUrl		string `json:"webhookURL"`
-	BaseCurrency	string `json:"baseCurrency"`
-	TargetCurrency	string `json:"targetCurrency"`
-	MinTrigger		float64 `json:"minTriggerValue"`
-	MaxTrigger		float64 `json:"maxTriggerValue"`
+	Id             bson.ObjectId `json:"-" bson:"_id"`
+	WebHookUrl     string        `json:"webhookURL"`
+	BaseCurrency   string        `json:"baseCurrency"`
+	TargetCurrency string        `json:"targetCurrency"`
+	MinTrigger     float64       `json:"minTriggerValue"`
+	MaxTrigger     float64       `json:"maxTriggerValue"`
 }
 
 // Currency struct for currency exchange
 type Currency struct {
-	Base			string `json:"base"`
-	Date 			string `json:"date"`
-	Rates			map[string]interface{} `json:"rates"`
+	Base  string                 `json:"base"`
+	Date  string                 `json:"date"`
+	Rates map[string]interface{} `json:"rates"`
 }
 
 var Durl = "mongodb://admin:123@ds233895.mlab.com:33895/assignment2"
 
-func CheckTrigger () {
+func CheckTrigger() {
 
 	var re []Webhook
 	cu := &Currency{}
@@ -71,9 +71,8 @@ func CheckTrigger () {
 	}
 }
 
-
-func invokeWebhook(ur Webhook, cur float64 ) {
-	ma := make (map[string]interface{})
+func invokeWebhook(ur Webhook, cur float64) {
+	ma := make(map[string]interface{})
 
 	ma["baseCurrency"] = ur.BaseCurrency
 	ma["targetCurrency"] = ur.TargetCurrency
@@ -82,13 +81,13 @@ func invokeWebhook(ur Webhook, cur float64 ) {
 	ma["maxTriggerValue"] = ur.MaxTrigger
 
 	resp, err := json.Marshal(ma)
-	if err != nil{
+	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	res, err := http.Post(ur.WebHookUrl, "application/json", bytes.NewBuffer(resp))
-	if err != nil{
+	if err != nil {
 		fmt.Println(err)
 		return
 	}
@@ -100,7 +99,7 @@ func HandlerProjects(w http.ResponseWriter, r *http.Request) {
 	ur := &Webhook{}
 
 	session, err := mgo.Dial(Durl)
-	if err != nil{
+	if err != nil {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -133,7 +132,7 @@ func HandlerWebhookId(w http.ResponseWriter, r *http.Request) {
 	urlid := s[len(s)-1]
 
 	session, err := mgo.Dial(Durl)
-	if err != nil{
+	if err != nil {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -153,8 +152,8 @@ func HandlerWebhookId(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(ur)
 	}
 
-	if r.Method == http.MethodDelete{
-		if err != nil{
+	if r.Method == http.MethodDelete {
+		if err != nil {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
@@ -166,7 +165,7 @@ func HandlerWebhookId(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetContent(url string, target interface{})error {
+func GetContent(url string, target interface{}) error {
 	resp, err := http.Get(url)
 	if err != nil {
 		return err
@@ -211,7 +210,6 @@ func HandlerLatest(w http.ResponseWriter, r *http.Request) {
 
 		rate := target / base
 		fmt.Fprintf(w, "%f", rate)
-
 
 	} else {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)

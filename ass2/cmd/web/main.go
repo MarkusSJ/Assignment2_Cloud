@@ -16,5 +16,5 @@ func main() {
 	http.HandleFunc("/exchange/latest", fotsopp.HandlerLatest)
 	http.HandleFunc("/exchange/average", fotsopp.HandlerAverage)
 	http.HandleFunc("/exchange/evaluationtrigger", fotsopp.HandlerEvaluation)
-	http.ListenAndServe(":" + port, nil)
+	http.ListenAndServe(":"+port, nil)
 }
